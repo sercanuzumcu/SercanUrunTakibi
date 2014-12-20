@@ -5,7 +5,7 @@ using System.Web;
 
 namespace SercanUrunTakibi.Models
 {
-    public class SubCategory
+    public class SubCategory : BaseClass
     {
         //Kılçık -> Standart Kılçık <-- SubCategory
         public int SubCategoryId { get; set; }

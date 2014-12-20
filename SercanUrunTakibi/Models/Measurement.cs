@@ -5,7 +5,7 @@ using System.Web;
 
 namespace SercanUrunTakibi.Models
 {
-    public class Measurement
+    public class Measurement : BaseClass
     {
         public int MeasurementId { get; set; }
         public String MeasurementText { get; set; }

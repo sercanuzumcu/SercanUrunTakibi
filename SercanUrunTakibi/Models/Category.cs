@@ -6,22 +6,24 @@ using System.Web;
 
 namespace SercanUrunTakibi.Models
 {
-    public class Category
+    public class Category : BaseClass
     {
         // Kılçık <-- Category -> Standart Kılçık
-        public int CategoryId { get; set; }
         public String CategoryName { get; set; }
-        public bool IsActive { get; set; }
 
 
-        SqlConnection cnn = new SqlConnection("Server=.;Database=SercanDB; Trusted_Connection=true");
+        
 
-        public Category(String p_categoryName)
+        // Insert Ctor
+        public Category(String p_categoryName,int p_createUser)
         {
-            String sql = "insert into category (category_name) values (@Category_Name)";
+            String sql = "insert into category"
+                +" (category_name,create_user,create_date)"
+            +" values (@Category_Name,@Create_User,now())";
             SqlCommand cmd = new SqlCommand(sql, cnn);
             cmd.Parameters.AddWithValue("@Category_Name", p_categoryName);
-
+            cmd.Parameters.AddWithValue("@Create_User", p_createUser);
+            
             try
             {
                 cnn.Open();
@@ -33,7 +35,8 @@ namespace SercanUrunTakibi.Models
                 throw new Exception(ex.Message);
             }
         }
-
+       
+        // Get Ctor
         public Category(int p_categoryId)
         {
             String sql = "select * from category where category_id = @CategoryId";
@@ -46,9 +49,13 @@ namespace SercanUrunTakibi.Models
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    this.CategoryId = reader.GetInt32(0);
+                    this.Id = reader.GetInt32(0);
                     this.CategoryName = reader.GetString(1);
                     this.IsActive = reader.GetBoolean(2);
+                    this.CreateUser = reader.GetInt32(3);
+                    this.CreateDate = reader.GetDateTime(4);
+                    this.LastUpdateUser = reader.GetInt32(5);
+                    this.LastUpdateDate = reader.GetDateTime(6);
                 }
                 reader.Close();
                 cnn.Close();
@@ -60,14 +67,16 @@ namespace SercanUrunTakibi.Models
 
         }
 
+        // Save ve Delete
         public void Save(){
             String sql = "update category"
-                +" set category_name = @CategoryName,is_active = @IsActive"
+                +" set category_name = @CategoryName,is_active = @IsActive,last_update_user = @LastUpdateUser, last_update_date = now()"
                 +" where category_id = @CategoryId";
             SqlCommand cmd = new SqlCommand(sql, cnn);
             cmd.Parameters.AddWithValue("@CategoryName", this.CategoryName);
             cmd.Parameters.AddWithValue("@IsActive", this.IsActive);
-            cmd.Parameters.AddWithValue("@CategoryId", this.CategoryId);
+            cmd.Parameters.AddWithValue("@LastUpdateUser", this.LastUpdateUser);
+            cmd.Parameters.AddWithValue("@CategoryId", this.Id);
 
             try
             {
@@ -80,13 +89,12 @@ namespace SercanUrunTakibi.Models
                 throw new Exception(ex.Message);
             }
 
-        }
+        }       
 
-        public void ConnectionCloser(SqlConnection p_cnn) {
-            if (p_cnn.State == System.Data.ConnectionState.Open)
-            {
-                p_cnn.Close();
-            }
-        }
+        // TODO: GetAll
+
+       
+
+
     }
 }
